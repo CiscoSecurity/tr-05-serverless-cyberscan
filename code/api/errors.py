@@ -1,6 +1,7 @@
 AUTH_ERROR = 'authorization error'
 INVALID_ARGUMENT = 'invalid argument'
 UNKNOWN = 'unknown'
+CONNECTION_ERROR = 'connection error'
 
 
 class TRFormattedError(Exception):
@@ -38,4 +39,13 @@ class WatchdogError(TRFormattedError):
         super().__init__(
             code='health check failed',
             message='Invalid Health Check'
+        )
+
+
+class CyberScanConnectionError(TRFormattedError):
+    def __init__(self, url):
+        super().__init__(
+            CONNECTION_ERROR,
+            'Unable to connect to CyberScan,'
+            f' validate the configured API endpoint: {url}'
         )
