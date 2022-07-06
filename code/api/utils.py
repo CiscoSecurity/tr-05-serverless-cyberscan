@@ -3,7 +3,7 @@ from json.decoder import JSONDecodeError
 
 import jwt
 import requests
-from flask import request, jsonify, current_app
+from flask import request, jsonify, current_app, g
 from jwt import InvalidSignatureError, DecodeError, InvalidAudienceError
 from requests.exceptions import ConnectionError, InvalidURL, HTTPError
 
@@ -153,3 +153,22 @@ def set_ctr_entities_limit(payload):
     except (KeyError, ValueError, AssertionError):
         ctr_entities_limit = current_app.config['CTR_DEFAULT_ENTITIES_LIMIT']
     current_app.config['CTR_ENTITIES_LIMIT'] = ctr_entities_limit
+
+
+def format_docs(docs):
+    return {'count': len(docs), 'docs': docs}
+
+
+def jsonify_result():
+    result = {'data': {}}
+
+    if g.get('sightings'):
+        result['data']['sightings'] = format_docs(g.sightings)
+
+    if g.get('errors'):
+        result['errors'] = g.errors
+
+        if not result.get('data'):
+            result.pop('data', None)
+
+    return jsonify(result)
