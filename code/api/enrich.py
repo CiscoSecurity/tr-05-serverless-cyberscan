@@ -33,6 +33,11 @@ def observe_observables():
 
 @enrich_api.route('/refer/observables', methods=['POST'])
 def refer_observables():
-    _ = get_credentials()
-    _ = get_observables()
-    return jsonify_data([])
+    credentials = get_credentials()
+    observables = get_observables()
+
+    client = CyberScanClient(credentials)
+
+    relay_output = client.refer(observables)
+
+    return jsonify_data(relay_output)

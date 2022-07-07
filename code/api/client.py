@@ -7,6 +7,11 @@ from api.errors import CyberScanConnectionError, AuthorizationError
 
 INVALID_CREDENTIALS = 'wrong api_key'
 
+REFER_PATH = {
+    'ip': 'ip/{observable}',
+    'domain': 'domain/{observable}'
+}
+
 
 class CyberScanClient:
     def __init__(self, credentials):
@@ -47,6 +52,32 @@ class CyberScanClient:
         print(response)
 
         return response.get('vulnerabilities')
+
+    def refer(self, observables):
+        self._auth()
+        relay_output = []
+        for observable in observables:
+
+            path = REFER_PATH[observable.get('type')].format(
+                observable=observable.get('value')
+            )
+            response = self._request(path)
+
+            relay_output.append(
+                {
+                    'id': ('ref-cyberscan-search-'
+                           f'{observable["type"].replace("_", "-")}'
+                           f'-{observable["value"]}'),
+                    'title': f'Details for this {observable.get("type")}',
+                    'description':
+                        f'Details for this {observable["type"]} '
+                        'in the CyberScan',
+                    'url': response.get('details_page'),
+                    'categories': ['CyberScan'],
+                }
+            )
+
+        return relay_output
 
     def _request(self, path, method='GET', payload=None):
         url = '/'.join([self._url, path.lstrip('/')])
