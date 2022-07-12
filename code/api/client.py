@@ -19,6 +19,7 @@ class CyberScanClient:
         self._headers = {
             'User-Agent': current_app.config['USER_AGENT']
         }
+        self._ctr_entities_limit = current_app.config['CTR_ENTITIES_LIMIT']
 
     @property
     def _url(self):
@@ -49,9 +50,11 @@ class CyberScanClient:
             else self._get_domain_ip(observable)
         path = f'vulnerabilities/ip/{ip}'
         response = self._request(path)
-        print(response)
+        vulnerabilities = response.get('vulnerabilities')
+        if len(vulnerabilities) > self._ctr_entities_limit:
+            vulnerabilities = vulnerabilities[:self._ctr_entities_limit]
 
-        return response.get('vulnerabilities')
+        return vulnerabilities
 
     def refer(self, observables):
         self._auth()
