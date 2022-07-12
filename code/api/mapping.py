@@ -60,7 +60,7 @@ class Sighting:
 
     @staticmethod
     def _title(vulnerability):
-        return vulnerability.get('title')
+        return vulnerability.get('name')
 
     def extract(self, vulnerability):
         sighting = {
