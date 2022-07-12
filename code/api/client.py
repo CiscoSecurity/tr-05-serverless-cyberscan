@@ -1,9 +1,14 @@
-import requests
-from flask import current_app
-from requests.exceptions import ConnectionError
 from http import HTTPStatus
 
-from api.errors import CyberScanConnectionError, AuthorizationError
+import requests
+from flask import current_app
+from requests.exceptions import ConnectionError, SSLError
+
+from api.errors import (
+    CyberScanConnectionError,
+    AuthorizationError,
+    CyberScanSSLError,
+)
 
 INVALID_CREDENTIALS = 'wrong api_key'
 
@@ -88,6 +93,8 @@ class CyberScanClient:
         try:
             response = requests.request(method, url, json=payload,
                                         headers=self._headers)
+        except SSLError as error:
+            raise CyberScanSSLError(error)
         except ConnectionError:
             raise CyberScanConnectionError(url)
 
