@@ -99,7 +99,7 @@ class CyberScanClient:
 
         try:
             response = requests.request(method, url, json=payload,
-                                        headers=self._headers)
+                                        headers=self._headers, timeout=10)
         except SSLError as error:
             raise CyberScanSSLError(error)
         except (ConnectionError, InvalidURL):
