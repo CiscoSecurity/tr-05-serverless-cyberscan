@@ -46,18 +46,25 @@ class CyberScanClient:
     def _get_domain_ip(self, observable):
         path = f'domain/{observable["value"]}'
         response = self._request(path)
+        try:
+            ip = response.get('ip')
+        except AttributeError:
+            ip = ''
 
-        return response.get('ip')
+        return ip
 
     def get_vulnerabilities(self, observable):
         self._auth()
         ip = observable['value'] if observable['type'] == 'ip' \
             else self._get_domain_ip(observable)
-        path = f'vulnerabilities/ip/{ip}'
-        response = self._request(path)
-        vulnerabilities = response.get('vulnerabilities')
-        if len(vulnerabilities) > self._ctr_entities_limit:
-            vulnerabilities = vulnerabilities[:self._ctr_entities_limit]
+        if ip:
+            path = f'vulnerabilities/ip/{ip}'
+            response = self._request(path)
+            vulnerabilities = response.get('vulnerabilities')
+            if len(vulnerabilities) > self._ctr_entities_limit:
+                vulnerabilities = vulnerabilities[:self._ctr_entities_limit]
+        else:
+            vulnerabilities = []
 
         return vulnerabilities
 
