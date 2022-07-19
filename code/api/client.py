@@ -57,15 +57,13 @@ class CyberScanClient:
         self._auth()
         ip = observable['value'] if observable['type'] == 'ip' \
             else self._get_domain_ip(observable)
-        if ip:
-            path = f'vulnerabilities/ip/{ip}'
-            response = self._request(path)
+        vulnerabilities = []
+        path = f'vulnerabilities/ip/{ip}'
+        response = self._request(path)
+        if response:
             vulnerabilities = response.get('vulnerabilities')
             if len(vulnerabilities) > self._ctr_entities_limit:
                 vulnerabilities = vulnerabilities[:self._ctr_entities_limit]
-        else:
-            vulnerabilities = []
-
         return vulnerabilities
 
     def refer(self, observables):
