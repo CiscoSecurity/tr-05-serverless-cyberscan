@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 import requests
 from flask import current_app
-from requests.exceptions import ConnectionError, SSLError
+from requests.exceptions import ConnectionError, SSLError, InvalidURL
 
 from api.errors import (
     CyberScanConnectionError,
@@ -95,7 +95,7 @@ class CyberScanClient:
                                         headers=self._headers)
         except SSLError as error:
             raise CyberScanSSLError(error)
-        except ConnectionError:
+        except (ConnectionError, InvalidURL):
             raise CyberScanConnectionError(url)
 
         if response.ok:
